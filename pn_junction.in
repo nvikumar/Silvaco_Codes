@@ -1,0 +1,61 @@
+go atlas
+
+# MESH
+mesh space.mult=1.0
+
+x.mesh loc=0 spac=0.5
+x.mesh loc=2 spac=0.25
+x.mesh loc=4 spac=0.2
+x.mesh loc=6 spac=0.2
+x.mesh loc=8 spac=0.25
+x.mesh loc=10 spac=0.5
+
+y.mesh loc=-1 spac=0.1
+y.mesh loc=0 spac=0.05
+y.mesh loc=2 spac=0.05
+y.mesh loc=4 spac=0.05
+y.mesh loc=5 spac=0.1
+
+# region
+region num=1 material=silicon x.min=0.0 x.max=10.0 y.min=0.0 y.max=2.0
+region num=2 material=silicon x.min=0.0 x.max=10.0 y.min=2.0 y.max=4.0
+
+# electrode
+elec num=1 name=anode x.min=0.0 x.max=10.0 y.min=-1.0 y.max=0.0 material=Aluminum
+elec num=2 name=cathode x.min=0.0 x.max=10.0 y.min=4.0 y.max=5.0 material=Aluminum
+
+# CONTACTS
+contact name=anode
+contact name=cathode neutral
+
+# DOPING
+doping region=1 uniform p.type conc=1e16
+doping region=2 uniform n.type conc=1e16
+
+# MODELS
+models srh conmob fldmob auger
+
+# SOLVE
+# contact name=Anode workf=0.0
+method newton
+output con.band val.band
+solve init
+save outf=pn_junc_diode.str
+
+# Diode I-V Characteristics
+log outf=pn_junc_diode_IV.log
+
+# forward bias
+# solve vanode=0 vstep=0.01 vfinal=1 name=anode
+
+# reverse bias
+# solve vanode=-14 vstep=0.3 vfinal=0 name=anode
+
+# rev. to forward bias
+  solve vanode=-10 vstep=0.01 vfinal=1 name=anode
+
+save outf=pn_diode_1.str
+tonyplot pn_junc_diode.str
+tonyplot pn_junc_diode_IV.log
+quit
+
